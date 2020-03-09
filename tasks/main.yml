@@ -1,0 +1,30 @@
+---
+# a tasks file for packethost-machine
+#
+# find my project ID
+# This value must be set in vars/main.yml
+# assumes I only have one project
+
+- name: find the project ID
+  import_tasks: get-project-id.yml
+  tags: 
+  - get-project-id
+  - never 
+  delegate_to: localhost
+  connection: local
+
+- name: rent a machine
+  import_tasks: rent.yml
+  tags: 
+  - untagged
+  delegate_to: localhost
+  connection: local
+
+- name: release a machine
+  import_tasks: release.yml
+  tags: 
+  - destroy
+  - never 
+  delegate_to: localhost
+  connection: local
+

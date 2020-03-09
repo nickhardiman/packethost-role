@@ -1,0 +1,19 @@
+---
+# defaults file for packethost-machine
+# Set your own values in vars/main.yml
+# See vars/main.yml for explanations.
+#
+packethost_auth_token: a2345ZpG6EL5udUVT5MTjhEPKF8TWBQp
+packethost_project_id: a23e4567-e89b-12d3-a456-426655440000
+packethost_ssh_key_id: a23e4567-e89b-12d3-a456-426655440000
+packethost_facility: ams1
+packethost_type: s1.large.x86
+packethost_os: rhel_7
+packethost_pub_key_file: my-packet-key.pub
+
+#my_hostname: my_packet_machine
+
+# Machine creation sets these facts.
+# packethost_device_id: a23e4567-e89b-12d3-a456-426655440000
+# packethost_device_ipv4: '0.0.0.0'
+

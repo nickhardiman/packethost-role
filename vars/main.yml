@@ -1,0 +1,145 @@
+---
+# vars file for packethost-machine
+
+# packethost variables
+# variables are shown with default values taken from 
+# roles/packethost-machine/defaults/main.yml
+# You definitely want to change the API key (packethost_auth_token). 
+# You may want to change others. 
+# To change a value, uncomment the line and edit the value.
+# You can also change the value on the command line with the 
+# --extra-vars option.
+
+# API key
+# ??? shouldn't this be encrypted with vault? 
+# Find this in the packethost web UI.
+# This API key is required by ansible modules and the packet CLI.
+# The packet CLI (https://github.com/packethost/packet-cli) looks for 
+# this environment variable.
+# $ export PACKET_TOKEN=12345ZpG6EL5udUVT5MTjhEPKF8TWBQp
+#
+packethost_auth_token: 12345ZpG6EL5udUVT5MTjhEPKF8TWBQp
+
+# messing around with inventory update via vars file
+my_vars_file: roles/packethost-machine/vars/main.yml
+
+# project
+# Create a project using the packethost web UI or the packet CLI.
+# List projects using the packet CLI.
+# $ packet project get --yaml
+# This ID and other IDs are UUIDs (https://en.wikipedia.org/wiki/Universally_unique_identifier).
+#
+#packethost_project_id: a23e4567-e89b-12d3-a456-426655440000
+
+# SSH public key
+# Each uploaded key gets an ID. 
+# List keys with the packet CLI.
+# $ packet ssh-key get
+#
+#packethost_ssh_key_id: a23e4567-e89b-12d3-a456-426655440000
+
+# machine ID
+# Each machine rented gets an ID.
+# $ packet device get --project-id a23e4567-e89b-12d3-a456-426655440000 --yaml
+#
+#packethost_device_id: a23e4567-e89b-12d3-a456-426655440000
+
+# machine IPv4 address
+# Each machine rented gets one IP.
+# $ packet device get --project-id a23e4567-e89b-12d3-a456-426655440000 --yaml
+#
+#packethost_device_ipv4: 1.2.3.4
+
+# machine location
+# $ packet facilities get
+# choices in February 2020 
+# +-------------------+------+--------------------------------------------------------+
+# |       NAME        | CODE |                        FEATURES                        |
+# +-------------------+------+--------------------------------------------------------+
+# | Toronto, ON, CA   | yyz1 | baremetal,layer_2                                      |
+# | Ashburn, VA       | iad2 | baremetal,layer_2,global_ipv4,backend_transfer         |
+# | Marseille, France | mrs1 | baremetal,layer_2,backend_transfer                     |
+# | Hong Kong 1, HK   | hkg1 | baremetal,layer_2,backend_transfer                     |
+# | Singapore         | sin3 | baremetal,layer_2,backend_transfer,global_ipv4         |
+# | Dallas, TX        | dfw2 | baremetal,global_ipv4,backend_transfer,layer_2,storage |
+# | Seattle, WA       | sea1 | baremetal,layer_2,backend_transfer                     |
+# | Sunnyvale, CA     | sjc1 | baremetal,storage,layer_2,global_ipv4,backend_transfer |
+# | Tokyo, JP         | nrt1 | baremetal,layer_2,storage,global_ipv4,backend_transfer |
+# | Parsippany, NJ    | ewr1 | baremetal,storage,backend_transfer,layer_2,global_ipv4 |
+# | Los Angeles, CA   | lax1 | baremetal,layer_2,backend_transfer                     |
+# | Ashburn, VA       | iad1 | baremetal,layer_2,backend_transfer                     |
+# | Sydney, Australia | syd2 | baremetal,layer_2,backend_transfer                     |
+# | Amsterdam, NL     | ams1 | baremetal,storage,global_ipv4,backend_transfer,layer_2 |
+# | Frankfurt 2, DE   | fra2 | baremetal,layer_2,backend_transfer                     |
+# +-------------------+------+--------------------------------------------------------+
+#
+#packethost_facility: ams1
+
+# machine type 
+# https://github.com/packethost/packet-cli/blob/master/docs/packet_plan_get.md
+# $ packet plan get
+# +--------------------------------------+---------------+---------------+
+# |                  ID                  |     SLUG      |     NAME      |
+# +--------------------------------------+---------------+---------------+
+# | d16a68ff-b21c-4781-a22b-3a0f37c435f8 | c2.large.arm  | c2.large.arm  |
+# | 5aeee4f9-1137-4514-8f3e-a1e103b02966 | c2.medium.x86 | c2.medium.x86 |
+# | 18810cec-1711-4f30-b323-a1001804b10f | g2.large.x86  | g2.large.x86  |
+# | c5a9c64a-07e4-46a9-8dfe-2437f521dcb8 | m2.xlarge.x86 | m2.xlarge.x86 |
+# | 174c4bec-7090-4651-9b81-567080a4a7cb | n2.xlarge.x86 | n2.xlarge.x86 |
+# | 87728148-3155-4992-a730-8d1e6aca8a32 | storage_1     | Standard      |
+# | d6570cfb-38fa-4467-92b3-e45d059bb249 | storage_2     | Performance   |
+# | c3ee2482-060c-4d17-949f-377ee3c18b08 | x2.xlarge.x86 | x2.xlarge.x86 |
+# | 3bc8a214-b807-4058-ad4a-6925f2411155 | baremetal_2a  | c1.large.arm  |
+# | 6d1f1ffa-7912-4b78-b50d-88cc7c8ab40f | baremetal_1   | c1.small.x86  |
+# | 741f3afb-bb2f-4694-93a0-fcbad7cd5e78 | baremetal_3   | c1.xlarge.x86 |
+# | a3729923-fdc4-4e85-a972-aafbad3695db | baremetal_2   | m1.xlarge.x86 |
+# | 66173669-84fc-43b3-92b5-64f84497c887 | baremetal_s   | s1.large.x86  |
+# | e69c0169-4726-46ea-98f1-939c9e8a3607 | baremetal_0   | t1.small.x86  |
+# | e829e15f-bfa0-4d8f-806e-cc92bb6567b4 | baremetal_1e  | x1.small.x86  |
+# +--------------------------------------+---------------+---------------+
+#
+#packethost_type: n1.large.x86
+
+# operating_system
+# https://github.com/packethost/packet-cli/blob/master/docs/packet_operating-systems_get.md
+# $ packet operating-systems get
+# +---------------------------+-----------------+-------------+---------+
+# |           NAME            |      SLUG       |   DISTRO    | VERSION |
+# +---------------------------+-----------------+-------------+---------+
+# | Alpine 3                  | alpine_3        | alpine      | 3       |
+# | CentOS 6                  | centos_6        | centos      | 6       |
+# | CentOS 7                  | centos_7        | centos      | 7       |
+# | Container Linux - Alpha   | coreos_alpha    | coreos      | alpha   |
+# | Container Linux - Beta    | coreos_beta     | coreos      | beta    |
+# | Container Linux - Stable  | coreos_stable   | coreos      | stable  |
+# | Custom iPXE               | custom_ipxe     | custom_ipxe | 1       |
+# | Custom / Manual           | custom          | custom      | 1       |
+# | Debian 10                 | debian_10       | debian      | 10      |
+# | Debian 8                  | debian_8        | debian      | 8       |
+# | Debian 9                  | debian_9        | debian      | 9       |
+# | Deprovision               | deprovision     | centos      |         |
+# | Flatcar Linux - Alpha     | flatcar_alpha   | flatcar     | alpha   |
+# | Flatcar Linux - Beta      | flatcar_beta    | flatcar     | beta    |
+# | Flatcar Linux - Edge      | flatcar_edge    | flatcar     | edge    |
+# | Flatcar Linux - Stable    | flatcar_stable  | flatcar     | stable  |
+# | FreeBSD 11.2              | freebsd_11_2    | freebsd     | 11.2    |
+# | FreeBSD 12.1              | freebsd_12_1    | freebsd     | 12.1    |
+# | NixOS 18.03               | nixos_18_03     | nixos       | 18.03   |
+# | NixOS 19.03               | nixos_19_03     | nixos       | 19.03   |
+# | OpenSUSE 42.3             | opensuse_42_3   | opensuse    | 42.3    |
+# | RancherOS                 | rancher         | rancher     | latest  |
+# | RedHat Enterprise Linux 7 | rhel_7          | rhel        | 7       |
+# | Scientific Linux 6        | scientific_6    | scientific  | 6       |
+# | SLES 12 SP3               | suse_sles12_sp3 | suse        | 12 SP3  |
+# | Ubuntu 14.04 LTS          | ubuntu_14_04    | ubuntu      | 14.04   |
+# | Ubuntu 16.04 LTS          | ubuntu_16_04    | ubuntu      | 16.04   |
+# | Ubuntu 17.10              | ubuntu_17_10    | ubuntu      | 17.10   |
+# | Ubuntu 18.04 LTS          | ubuntu_18_04    | ubuntu      | 18.04   |
+# | Ubuntu 19.04              | ubuntu_19_04    | ubuntu      | 19.04   |
+# | VMware ESXi 6.5           | vmware_esxi_6_5 | vmware      | 6.5     |
+# | Windows 2012 R2           | windows_2012_r2 | windows     | 2012 R2 |
+# | Windows 2016 Standard     | windows_2016    | windows     | 2016    |
+# +---------------------------+-----------------+-------------+---------+
+#
+#packethost_os: rhel_7
+

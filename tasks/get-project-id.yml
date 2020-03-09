@@ -1,0 +1,79 @@
+---
+# get project ID
+# requirements
+# a key pair 
+# a packet auth token
+#   can be created using the web UI 
+#   and stored in the PACKET_TOKEN environment variable.
+# the packet CLI
+# one packet project 
+#   code below checks the first in list only
+# 
+# Uses the packet CLI.
+# This CLI command returns a list of projects.
+# request 
+# $ packet project get --json
+# reply
+# [
+#     {
+#         "backend_transfer_enabled": false,
+#         "created_at": "2020-01-31T10:21:30Z",
+#         "href": "/projects/123e4567-e89b-12d3-a456-426655440000",
+#         "id": "123e4567-e89b-12d3-a456-426655440000",
+#         "members": [ ... ],
+#         "name": "my_project",
+#         "organization": { ... },
+#         "payment_method": { ... },
+#         "updated_at": "2020-02-26T23:54:34Z"
+#     }
+# ]
+# 
+
+
+- name: whats returned
+  debug: 
+    var: packethost_auth_token
+    verbosity: 1
+
+- name: find the project ID
+  shell: packet project get --yaml
+  register: packet_reply
+  environment:
+    PACKET_TOKEN: "{{ packethost_auth_token }}"
+
+- name: whats returned
+  debug: 
+    var: packet_reply
+    verbosity: 1
+
+- name: extract the project ID
+  vars:
+    my_packet_reply_list: "{{ packet_reply.stdout | from_yaml }}"
+  set_fact: 
+    packethost_project_id: "{{ my_packet_reply_list[0]['id'] }}"
+
+- name: whats returned
+  debug: 
+    var: packethost_project_id
+    verbosity: 1
+
+# store the project ID 
+# my_vars_file from 
+# roles/packethost-machine/vars/test.yml
+
+- name: put this value somewhere safe
+  debug:
+    msg: "copying value to {{ my_vars_file }}"
+  failed_when: my_vars_file is not defined or my_vars_file == ''
+
+- name: my vars file exists
+  file:
+    path: "{{ my_vars_file }}"
+    state: touch
+
+- name: update vars file with project ID
+  lineinfile:
+    path: "{{ my_vars_file }}"
+    regexp: 'packethost_project_id:'
+    line: 'packethost_project_id: "{{ packethost_project_id }}"'
+    

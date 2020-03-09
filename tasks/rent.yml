@@ -1,0 +1,142 @@
+---
+# tasks file for packethost-machine
+# Change this so it either creates a new machine or sets facts from a running machine.
+# Rent or release a packethost machine.
+# This is bare metal, not a VM, so there is no create or destroy.
+#
+# requirements
+# the inventory contains one host, 'my-packet-machine'
+# a key pair 
+# a packet auth token
+#   can be created using the web UI 
+#   and stored in the PACKET_TOKEN environment variable.
+# the packet CLI
+# python packet module
+# ansible packet modules 
+#   these are bundled with ansible
+# one packet project 
+#   code below checks the first in list only
+# 
+# module packet_device returns this. 
+# {
+#     "changed": true,
+#     "devices": [
+#         {
+#             "hostname": "my-packet-machine",
+#             "id": "83d3f5de-72c0-4e64-ae9e-f43e33fc6f91",
+#             "ip_addresses": [],
+#             "locked": false,
+#             "state": "queued",
+#             "tags": []
+#         }
+#     ],
+#     "failed": false
+# }
+# 
+# SSH key 
+
+- name: upload public key (not sure if this is a duplicate)
+  packet_sshkey:
+    auth_token: "{{ packethost_auth_token }}"
+    key_file: "{{ packethost_pub_key_file }}"
+    label: my public key for packethost
+
+# machine create
+
+- debug:
+    msg: "reserve new machine: hostname {{ inventory_hostname }}, OS: {{ packethost_os }}, plan: {{ packethost_type }}, facility: {{ packethost_facility }}"
+
+- name: reserve a machine
+  packet_device:
+    auth_token: "{{ packethost_auth_token }}"
+    project_id: "{{ packethost_project_id }}"
+    hostnames: "{{ inventory_hostname }}"
+    operating_system: "{{ packethost_os }}"
+    plan: "{{ packethost_type }}"
+    facility: "{{ packethost_facility }}"
+    wait_for_public_IPv: 4
+  register: newhosts
+
+# check the result
+
+- name: "packet's reply"
+  debug: 
+    var: newhosts
+    verbosity: 1
+
+- name: alert the user
+  debug: 
+    msg: You can see this machine in your control panel at https://www.packethost/
+
+- name: extract the IP address
+  set_fact:
+    packethost_device_ipv4: "{{ newhosts['devices'][0]['public_ipv4'] }}"
+- debug: 
+    var: packethost_device_ipv4
+
+- name: extract the device ID
+  set_fact:
+    packethost_device_id: "{{ newhosts['devices'][0]['id'] }}"
+
+- debug: 
+    msg: 
+      - "writing these packet values to {{ my_vars_file }}" 
+      - "ansible_host: {{ packethost_device_ipv4 }}"
+      - "packet_device_id: {{ packethost_device_id }}"
+
+- name: add the new host to the inventory
+  add_host: 
+    name: "{{ packethost_device_ipv4 }}"
+    groups:
+    - packet
+
+- name: check - show all the hosts
+  debug:
+    msg: "{{ item }}"
+  with_inventory_hostnames:
+    - all
+
+# store new facts in inventory
+# set_fact above does it in memory, this does it in files
+
+- debug: 
+    msg: 
+      - "writing these packet values to {{ my_vars_file }}" 
+      - "ansible_host: {{ packethost_device_ipv4 }}"
+      - "packet_device_id: {{ packethost_device_id }}"
+
+- name: add IP to inventory file
+  lineinfile:
+    path: "{{ my_vars_file }}"
+    regexp: 'packethost_device_ipv4:'
+    line: 'packethost_device_ipv4: "{{ packethost_device_ipv4 }}"'
+
+# how to update in-memory inventory
+# Do any of these work properly?
+#
+#- name: add ansible_host to inventory/all/main.yaml
+#  lineinfile:
+#    path: "inventory/all/main.yaml"
+#    insertafter: "{{ inventory_hostname }}:"
+#    line: '          ansible_host: {{ packethost_device_ipv4 }}'
+#
+#- name: add IP to /etc/hosts
+#
+#- name: add IP to DNS
+#
+#- name: add IP to in-memory inventory
+#  set_fact:
+#    ansible_host: '{{ packethost_device_ipv4 }}'
+#
+#- name: add IP to in-memory inventory
+#  add_host:
+#    hostname: '{{ inventory_hostname }}'
+#    ansible_host: '{{ packethost_device_ipv4 }}'
+    
+- name: add device ID to inventory
+  lineinfile:
+    path: "{{ my_vars_file }}"
+    regexp: 'packethost_device_id:'
+    line: 'packethost_device_id: "{{ packethost_device_id }}"'
+    
+
