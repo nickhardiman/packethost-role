@@ -1,10 +1,11 @@
 packethost-role
 =================
-Nick's dev. Not fit for, well, anything much. 
+warning: Not fit for, well, anything much. 
+Very little is tested. Definitely doesn't work for a VMware host. See 'Broken!' below.
 
 Reserve a bare-metal machine from https://www.packet.com/.
 Little more than an ansible role wrapper around packet_sshkey and packet_device modules.
-Doesn't work for VMware host. 
+Defaults to creating a big RHEL7 box.
 
 Some people call Packet 'packet.net'.
 I used the label 'packethost'. I saw that here. 
@@ -15,29 +16,39 @@ https://github.com/packethost
 Requirements
 ------------
 
-packet CLI 
+*packet CLI *
 
 A task in here shells out to the packet CLI.
+```
 roles/packethost-machine/tasks/get-project-id.yml
+```
 Cheap and nasty.
 
 Role Variables
 --------------
 
 Variables are explained here.
-```roles/packethost-machine/defaults/main.yml```
+```
+roles/packethost-machine/defaults/main.yml
+```
 Variables are defined here.
-```roles/packethost-machine/defaults/main.yml```
+```
+roles/packethost-machine/defaults/main.yml
+```
 
 Role creates a machine and sets a couple host vars.
 - IP address
 - device ID
+
 These are set in memory and written to this inventory file.
-```roles/packethost-machine/vars/main.yml``` 
-Bit unorthodox, but I want to avoid a dependency on a dynamic inventory plug-in
+```
+roles/packethost-machine/vars/main.yml
+``` 
+Bit unorthodox. I want to avoid a dependency on a dynamic inventory plug-in,
 because nobody's written one for Packet.
 Not here, see?
 https://docs.ansible.com/ansible/latest/plugins/inventory.html
+
 Some kind soul wrote a dynamic inventory script, but are scripts less cool than flared trousers?
 https://github.com/ansible/ansible/blob/devel/contrib/inventory/packet_net.py
 
@@ -45,14 +56,13 @@ https://github.com/ansible/ansible/blob/devel/contrib/inventory/packet_net.py
 Dependencies
 ------------
 
-packet-python
-https://www.packet.com/developers/libraries/python/
+packet-python. See https://www.packet.com/developers/libraries/python/
 
 
 Example Playbook and other files
 ---------------------------------
 
-inventory
+*inventory*
 
 ```
 all:
@@ -62,11 +72,11 @@ all:
         my-packet-machine:
 ```
 
-my-packet-key.pub
+*my-packet-key.pub*
 
-A public key file to upload to Packet. See variable packethost_pub_key_file
+A public key file to upload to Packet. File name is set using the variable ```packethost_pub_key_file```.
 
-ansible.cfg 
+*ansible.cfg*
 
 ```
 # This file contains many parameters and descriptions. 
@@ -86,7 +96,8 @@ become_user=root
 become_method=sudo
 become_ask_pass=false
 ```
-my-packet-host.yml 
+
+*my-packet-host.yml* 
 
 playbook
 
@@ -101,13 +112,11 @@ playbook
 Examples 
 ----------
 
-add -v to see packet replies 
-```
-cd my-playbook-dir
+Add -v to see packet replies. If I remembered to add verbosity to my debug tasks.
 
-```
 find the project ID and add to vars file
 ```
+cd my-playbook-dir
 ansible-playbook my-packet-host.yml  --tags=get-project-id
 ```
 
@@ -122,6 +131,7 @@ ansible-playbook my-packet-host.yml  --tags=destroy
 ```
 
 override variables
+
 - Broken! Something is setting a tiny tiny subnet (/31), too small for VMware. 
 ```
 ansible-playbook my-packet-host.yml  \
